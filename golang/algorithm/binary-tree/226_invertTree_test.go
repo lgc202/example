@@ -5,18 +5,18 @@ import (
 	"testing"
 )
 
-type args struct {
+type args226 struct {
 	root *TreeNode
 }
 
-var tests = []struct {
+var tests226 = []struct {
 	name string
-	args args
+	args args226
 	want []int
 }{
 	{
 		name: "test1",
-		args: args{
+		args: args226{
 			root: &TreeNode{
 				Val: 4,
 				Left: &TreeNode{
@@ -43,7 +43,7 @@ var tests = []struct {
 	},
 	{
 		name: "test2",
-		args: args{
+		args: args226{
 			root: &TreeNode{
 				Val: 2,
 				Left: &TreeNode{
@@ -59,7 +59,7 @@ var tests = []struct {
 }
 
 func Test_invertTreeV1(t *testing.T) {
-	for _, tt := range tests {
+	for _, tt := range tests226 {
 		t.Run(tt.name, func(t *testing.T) {
 			got := invertTreeV1(tt.args.root)
 			if gotList := levelTraversal(got); !reflect.DeepEqual(gotList, tt.want) {
@@ -70,7 +70,7 @@ func Test_invertTreeV1(t *testing.T) {
 }
 
 func Test_invertTreeV2(t *testing.T) {
-	for _, tt := range tests {
+	for _, tt := range tests226 {
 		t.Run(tt.name, func(t *testing.T) {
 			got := invertTreeV2(tt.args.root)
 			if gotList := levelTraversal(got); !reflect.DeepEqual(gotList, tt.want) {
