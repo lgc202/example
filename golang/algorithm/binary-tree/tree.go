@@ -10,16 +10,67 @@ func NewNode(val int) *TreeNode {
 	return &TreeNode{Val: val}
 }
 
-func preOrderTraverse(root *TreeNode) []int {
-	return nil
+func preOrderTraversal(root *TreeNode) []int {
+	if root == nil {
+		return nil
+	}
+
+	var res []int
+	var dfs func(node *TreeNode)
+	dfs = func(node *TreeNode) {
+		if node == nil {
+			return
+		}
+
+		res = append(res, node.Val)
+		dfs(node.Left)
+		dfs(node.Right)
+	}
+
+	dfs(root)
+	return res
 }
 
 func inorderTraversal(root *TreeNode) []int {
-	return nil
+	if root == nil {
+		return nil
+	}
+
+	var res []int
+	var dfs func(node *TreeNode)
+	dfs = func(node *TreeNode) {
+		if node == nil {
+			return
+		}
+
+		dfs(node.Left)
+		res = append(res, node.Val)
+		dfs(node.Right)
+	}
+
+	dfs(root)
+	return res
 }
 
 func postorderTraversal(root *TreeNode) []int {
-	return nil
+	if root == nil {
+		return nil
+	}
+
+	var res []int
+	var dfs func(node *TreeNode)
+	dfs = func(node *TreeNode) {
+		if node == nil {
+			return
+		}
+
+		dfs(node.Left)
+		dfs(node.Right)
+		res = append(res, node.Val)
+	}
+
+	dfs(root)
+	return res
 }
 
 func levelTraversal(root *TreeNode) []int {

@@ -5,26 +5,6 @@ import (
 	"testing"
 )
 
-func TestNewNode(t *testing.T) {
-	type args struct {
-		val int
-	}
-	tests := []struct {
-		name string
-		args args
-		want *TreeNode
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewNode(tt.args.val); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewNode() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func Test_inorderTraversal(t *testing.T) {
 	type args struct {
 		root *TreeNode
@@ -34,7 +14,32 @@ func Test_inorderTraversal(t *testing.T) {
 		args args
 		want []int
 	}{
-		// TODO: Add test cases.
+		{
+			name: "test1",
+			args: args{
+				root: &TreeNode{
+					Val: 1,
+					Left: &TreeNode{
+						Val:   2,
+						Left:  &TreeNode{Val: 3},
+						Right: &TreeNode{Val: 4},
+					},
+					Right: &TreeNode{
+						Val:   5,
+						Left:  &TreeNode{Val: 6},
+						Right: &TreeNode{Val: 7},
+					},
+				},
+			},
+			want: []int{3, 2, 4, 1, 6, 5, 7},
+		},
+		{
+			name: "test2",
+			args: args{
+				root: nil,
+			},
+			want: nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -54,7 +59,32 @@ func Test_levelTraversal(t *testing.T) {
 		args args
 		want []int
 	}{
-		// TODO: Add test cases.
+		{
+			name: "test1",
+			args: args{
+				root: &TreeNode{
+					Val: 1,
+					Left: &TreeNode{
+						Val:   2,
+						Left:  &TreeNode{Val: 3},
+						Right: &TreeNode{Val: 4},
+					},
+					Right: &TreeNode{
+						Val:   5,
+						Left:  &TreeNode{Val: 6},
+						Right: &TreeNode{Val: 7},
+					},
+				},
+			},
+			want: []int{1, 2, 5, 3, 4, 6, 7},
+		},
+		{
+			name: "test2",
+			args: args{
+				root: nil,
+			},
+			want: nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -74,7 +104,32 @@ func Test_postorderTraversal(t *testing.T) {
 		args args
 		want []int
 	}{
-		// TODO: Add test cases.
+		{
+			name: "test1",
+			args: args{
+				root: &TreeNode{
+					Val: 1,
+					Left: &TreeNode{
+						Val:   2,
+						Left:  &TreeNode{Val: 3},
+						Right: &TreeNode{Val: 4},
+					},
+					Right: &TreeNode{
+						Val:   5,
+						Left:  &TreeNode{Val: 6},
+						Right: &TreeNode{Val: 7},
+					},
+				},
+			},
+			want: []int{3, 4, 2, 6, 7, 5, 1},
+		},
+		{
+			name: "test2",
+			args: args{
+				root: nil,
+			},
+			want: nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -94,11 +149,36 @@ func Test_preOrderTraverse(t *testing.T) {
 		args args
 		want []int
 	}{
-		// TODO: Add test cases.
+		{
+			name: "test1",
+			args: args{
+				root: &TreeNode{
+					Val: 1,
+					Left: &TreeNode{
+						Val:   2,
+						Left:  &TreeNode{Val: 3},
+						Right: &TreeNode{Val: 4},
+					},
+					Right: &TreeNode{
+						Val:   5,
+						Left:  &TreeNode{Val: 6},
+						Right: &TreeNode{Val: 7},
+					},
+				},
+			},
+			want: []int{1, 2, 3, 4, 5, 6, 7},
+		},
+		{
+			name: "test2",
+			args: args{
+				root: nil,
+			},
+			want: nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := preOrderTraverse(tt.args.root); !reflect.DeepEqual(got, tt.want) {
+			if got := preOrderTraversal(tt.args.root); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("preOrderTraverse() = %v, want %v", got, tt.want)
 			}
 		})
