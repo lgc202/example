@@ -268,7 +268,8 @@ func TestUseWaAgain(t *testing.T) {
 ![](assets/2023-05-05-21-27-02.png)  
 
 ## 复制使用
-Go 语言中的参数传递，都是值传递，就会产生复制操作。因此在向函数传递 WaitGroup 时，使用指针进行操作。
+Go 语言中的参数传递，都是值传递，就会产生复制操作。因此在向函数传递 WaitGroup 时，使用指针进行操作。   
+[点击查看源码](./007_copy_wg_test.go)   
 ```go
 func TestCopyWg(t *testing.T) {
 	var wg sync.WaitGroup
