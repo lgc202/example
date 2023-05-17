@@ -1,6 +1,6 @@
-# 前言
+# 1. 前言
 Go语言中的 WaitGroup 可以进行任务编排，比如我们有一个主任务在执行，执行到某一点时需要并行执行三个子任务，并且需要等到三个子任务都执行完后，再继续执行主任务。那我们就需要设置一个检查点，使主任务一直阻塞在这，等三个子任务执行完后再放行。
-# 基本使用
+# 2. 基本使用
 我们先来个简单的例子，看下 WaitGroup 是怎么使用的。示例中使用 Add(5) 表示我们有 5个 子任务，然后起了 5个 协程去完成任务，主协程使用 Wait() 方法等待 子协程执行完毕，输出一共等待的时间。     
 [点击查看源码](./001_base_use_test.go)
 ```go
@@ -21,8 +21,8 @@ func TestBaseUse(t *testing.T) {
 	fmt.Println(time.Since(start).Seconds())
 }
 ```
-# 原理分析
-## 总览
+# 3. 原理分析
+## 3.1 总览
 WaitGroup 一共有三个方法：
 ```go
 (wg *WaitGroup) Add(delta int)
@@ -35,9 +35,9 @@ WaitGroup 一共有三个方法：
 
 正常来说，我们使用的时候，需要先确定子任务的数量，然后调用 Add() 方法传入相应的数量，在每个子任务的协程中，调用 Done()，需要等待的协程调用 Wait() 方法，状态流转如下图：
 ![](assets/2023-05-05-19-50-09.png)
-## 底层实现
+## 3.2 底层实现
 > 以下涉及到的源码是基于Go1.19分析
-### WaitGroup 的结构
+### 3.2.1 WaitGroup 的结构
 ```go
 type WaitGroup struct {
 	noCopy noCopy
@@ -62,7 +62,7 @@ type WaitGroup struct {
 - 当调用 WaitGroup.Wait() 时，会将 waiter++。同时调用 runtime_Semacquire(semap), 增加信号量，并挂起当前 goroutine
 - 当调用 WaitGroup.Done() 时，将会 counter--。如果自减后的 counter 等于 0，说明 WaitGroup 的等待过程已经结束，则需要调用 runtime_Semrelease 释放信号量，唤醒正在 WaitGroup.Wait 的 goroutine, 释放的个数就是waiter的数量  
 
-### 内存对齐
+### 3.2.2 内存对齐
 ```go
 // state returns pointers to the state and sema fields stored within wg.state*.
 func (wg *WaitGroup) state() (statep *uint64, semap *uint32) {
@@ -88,7 +88,7 @@ Go语言中对于64位的变量进行原子操作，需要保证该变量是 64�
 
 因此，在前提 1 的情况下，WaitGroup 需要对 64 位进行原子操作。根据前提 2，WaitGroup 需要自行保证 count+waiter 的 64 位对齐。这个方法非常的巧妙，只不过是改变 semap 的位置顺序，就既可以保证 counter+waiter 一定会 64 位对齐，也可以保证内存的高效利用。WaitGroup 直接把 counter 和 waiter 看成了一个统一的 64 位变量。其中 counter 是这个变量的高 32 位，waiter 是这个变量的低 32 位。 在需要改变 counter 时, 通过将累加值左移 32 位的方式。
 
-### Add
+### 3.2.3 Add
 ```go
 // 为理解方便，去掉了调试相关的代码
 func (wg *WaitGroup) Add(delta int) {
@@ -133,14 +133,14 @@ func (wg *WaitGroup) Add(delta int) {
 }
 ```
 Add 方法主要操作的是 state 的计数部分。你可以为计数值增加一个 delta 值，内部通过原子操作把这个值加到计数值上。需要注意的是，这个 delta 也可以是个负数，相当于为计数值减去一个值，Done 方法内部其实就是通过Add(-1) 实现的。
-### Done
+### 3.2.4 Done
 ```go
 func (wg *WaitGroup) Done() {
 	wg.Add(-1)
 }
 ```
 
-### Wait
+### 3.2.5 Wait
 ```go
 // 为理解方便，去掉了调试相关的代码
 func (wg *WaitGroup) Wait() {
@@ -171,15 +171,15 @@ func (wg *WaitGroup) Wait() {
 ```
 Wait 方法的实现逻辑是：不断检查 state 的值。如果其中的计数值变为了 0，那么说明所有的任务已完成，调用者不必再等待，直接返回。如果计数值大于 0，说明此时还有任务没完成，那么调用者就变成了等待者，需要加入 waiter 队列，并且阻塞住自己。
 
-## 小结
+## 3.3 小结
 WaitGroup 的原理就五个点：内存对齐，原子操作，counter，waiter，信号量。   
 - 内存对齐的作用是为了原子操作。 
 - counter的增减使用原子操作，counter的作用是一旦为0就释放全部信号量。
 - waiter的自增使用原子操作，waiter的作用是表明要释放多少信号量。
 
-# 易错点
+# 4. 易错点
 上面分析源码可以看到几个会产生 panic 的点，这也是我们使用 WaitGroup 需要注意的地方。
-## 计数器设置为负值
+## 4.1 计数器设置为负值
 - 调用 Add 时参数值传负数   
   [点击查看源码](./002_call_add_use_negative_test.go)
   ```go
@@ -208,7 +208,7 @@ WaitGroup 的原理就五个点：内存对齐，原子操作，counter，waiter
 	wg.Wait()
   }
   ```  
-## Add 和 Wait 并发调用
+## 4.2 Add 和 Wait 并发调用
 Add 和 Wait 并发调用，有可能达不到我们预期的效果，甚至 panic。如下示例中，我们想要等待 3 个子任务都执行完后再执行主任务，但实际情况可能是子任务还没起来，主任务就继续往下执行了。   
 [点击查看源码](./004_add_called_concurrently_with_wait_test.go)
 ```go
@@ -250,7 +250,7 @@ func TestAddBeforeWait(t *testing.T) {
 ```   
 ![](assets/2023-05-05-21-20-57.png)  
 
-## 没有等 Wait 返回，就重用 WaitGroup
+## 4.3 没有等 Wait 返回，就重用 WaitGroup
 ```go
 func TestUseWaAgain(t *testing.T) {
 	var wg sync.WaitGroup
@@ -267,7 +267,7 @@ func TestUseWaAgain(t *testing.T) {
 ```
 ![](assets/2023-05-05-21-27-02.png)  
 
-## 复制使用
+## 4.4 复制使用
 Go 语言中的参数传递，都是值传递，就会产生复制操作。因此在向函数传递 WaitGroup 时，使用指针进行操作。   
 [点击查看源码](./007_copy_wg_test.go)   
 ```go
