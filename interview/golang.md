@@ -47,7 +47,7 @@ func StructCompare1() {
 	fmt.Println(aObj6 == nil) //  true，指针类型的数据可以和 nil 比较
 }
 ```
-假如 struct 中包含了不可比较的类型，Goland会直接报错
+假如 struct 中包含了不可比较的类型，Goland会直接报错   
 ![](assets/2023-05-17-23-25-24.png)
 
 # 2. 常见数据结构
