@@ -2,12 +2,11 @@ package pod
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"golang/kubeimooc/global"
 	"strings"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	pod_res "golang/kubeimooc/model/pod/response"
 )
 
 type PodService struct {
@@ -32,16 +31,16 @@ func (*PodService) GetPodList(namespace string, keyword string, nodeName string)
 	return err, podList
 }
 
-func (*PodService) GetPodDetail(namespace string, name string) (podReq pod_req.Pod, err error) {
-	ctx := context.TODO()
-	podApi := global.KubeConfigSet.CoreV1().Pods(namespace)
-	k8sGetPod, err := podApi.Get(ctx, name, metav1.GetOptions{})
-	if err != nil {
-		errMsg := fmt.Sprintf("Pod[namespace=%s,name=%s]查询失败, detail:%s", namespace, name, err.Error())
-		err = errors.New(errMsg)
-		return
-	}
-	//将k8s pod 转为 pod request
-	podReq = podConvert.K8s2ReqConvert.PodK8s2Req(*k8sGetPod)
-	return
-}
+// func (*PodService) GetPodDetail(namespace string, name string) (podReq pod_req.Pod, err error) {
+// 	ctx := context.TODO()
+// 	podApi := global.KubeConfigSet.CoreV1().Pods(namespace)
+// 	k8sGetPod, err := podApi.Get(ctx, name, metav1.GetOptions{})
+// 	if err != nil {
+// 		errMsg := fmt.Sprintf("Pod[namespace=%s,name=%s]查询失败, detail:%s", namespace, name, err.Error())
+// 		err = errors.New(errMsg)
+// 		return
+// 	}
+// 	//将k8s pod 转为 pod request
+// 	podReq = podConvert.K8s2ReqConvert.PodK8s2Req(*k8sGetPod)
+// 	return
+// }

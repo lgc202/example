@@ -1,4 +1,4 @@
-package initiallize
+package initialize
 
 import (
 	"golang/kubeimooc/global"
