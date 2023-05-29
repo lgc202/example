@@ -8,7 +8,7 @@ import (
 )
 
 func K8S() {
-	kubeconfig := ".kube/config"
+	kubeconfig := "/root/.kube/config"
 	// use the current context in kubeconfig
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
