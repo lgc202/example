@@ -171,3 +171,43 @@ curl http://192.168.159.131:8082/k8s/pod/kube-system
 ```shell
 git tag -a v1.0 -m "kubeimooc 项目后端初始化"
 ```
+
+## 1.4 vue 前端项目搭建   
+### 安装nodejs  
+```shell
+curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+sudo apt-get install -y nodejs
+node -v
+sudo apt update
+sudo apt install -y python3-pip
+pip3 install --upgrade pip
+pip3 --version
+```
+### clone项目
+```shell
+git clone https://github.com/PanJiaChen/vue-admin-template.git
+mv vue-admin-template kubeimooc-web
+```
+### 下载依赖
+```shell
+npm install --registry=https://registry.npm.taobao.org
+```
+### 删除部分代码
+- rsc/router/index.js  
+  example 之后的路由都不要，example只要一个子路由    
+- 关闭登录   
+  src/permission.js， 直接Next()
+- 关闭eslint  
+  (1) vue.config 关闭lintOnSave, 即改为false  
+  (2) node_modules 找到 webpack 的 package.json, 修改以下内容  
+  - 删除husky
+  - lint.stated 下数组设为空   
+  
+  (3) eslintignore 全部设为*   
+  (4) exlintrc.js extends 去除数组的最后一个元素  
+
+### 运行
+```shell
+sudo sysctl -w fs.inotify.max_user_watches=524288
+npm run dev
+```
