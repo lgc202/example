@@ -1,0 +1,9 @@
+package router
+
+import "golang/kubeimooc/router/example"
+
+type RouterGroup struct {
+	ExampleRouterGroup example.ExampleRouter
+}
+
+var RouterGroupApp = new(RouterGroup)
