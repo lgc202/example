@@ -138,3 +138,36 @@ go get -u github.com/gin-gonic/gin@v1.8.1
 go get -u github.com/spf13/viper@v1.13.0
 go get k8s.io/client-go@v0.23.7
 ```
+**项目目录如下**：
+```shell
+├── api
+│   ├── example
+│   └── k8s
+├── config
+├── convert
+│   └── pod
+├── doc
+│   └── assets
+├── global
+├── initialize
+├── model
+│   └── pod
+│       ├── request
+│       └── response
+├── response
+├── router
+│   ├── example
+│   └── k8s
+└── service
+    └── pod
+```
+**运行测试**：
+```shell
+go run main.go
+curl http://192.168.159.131:8082/example/ping
+curl http://192.168.159.131:8082/k8s/pod/kube-system
+```
+给代码打 tag 
+```shell
+git tag -a v1.0 -m "kubeimooc 项目后端初始化"
+```
