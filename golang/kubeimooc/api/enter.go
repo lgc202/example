@@ -1,8 +1,8 @@
 package api
 
 import (
-	"golang/kubeimooc/api/example"
-	"golang/kubeimooc/api/k8s"
+	"kubeimooc/api/example"
+	"kubeimooc/api/k8s"
 )
 
 type ApiGroup struct {

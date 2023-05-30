@@ -1,7 +1,7 @@
 package k8s
 
 import (
-	"golang/kubeimooc/api"
+	"kubeimooc/api"
 
 	"github.com/gin-gonic/gin"
 )

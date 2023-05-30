@@ -1,6 +1,6 @@
 package pod
 
-import "golang/kubeimooc/convert"
+import "kubeimooc/convert"
 
 type PodServiceGroup struct {
 	PodService

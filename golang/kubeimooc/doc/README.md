@@ -211,3 +211,165 @@ npm install --registry=https://registry.npm.taobao.org
 sudo sysctl -w fs.inotify.max_user_watches=524288
 npm run dev
 ```
+
+给代码打 tag 
+```shell
+git tag -a v1.1 -m "kubeimooc-web 前端项目初始化"
+```
+## 1.5 项目打包  
+### 后端项目打包 
+1. 编写 Dockerfile
+```Dockerfile
+FROM golang:1.19-alpine3.16 as builder
+WORKDIR /go/src/kubeimooc.com/server
+COPY . .
+
+RUN go env -w GO111MODULE=on \
+   && go env -w GOPROXY=https://goproxy.cn,direct \
+   && go env -w CGO_ENABLED=0 \
+   && go env \
+   && go mod tidy \
+   && go build -o server .
+
+FROM alpine:latest
+
+LABEL MAINTAINER="muxian@imooc.com"
+
+WORKDIR /go/src/kubeimooc.com/server
+COPY --from=0 /go/src/kubeimooc.com/server/config.yaml ./config.yaml
+COPY --from=0 /go/src/kubeimooc.com/server/.kube/config ./.kube/config
+COPY --from=0 /go/src/kubeimooc.com/server/server ./
+EXPOSE 8082
+ENTRYPOINT ./server
+```  
+2. 打包镜像   
+   ```shell
+   docker build -t harbor.kubeimooc.com/kubeimooc/kubeimooc:v1.0 .
+   docker push harbor.kubeimooc.com/kubeimooc/kubeimooc:v1.0
+   ```
+### 前端项目打包 
+1. 编写 Dockerfile  
+```Dockerfile
+#第一阶段构建
+FROM node:lts as builder
+WORKDIR /app/kubeimooc-web
+#拷贝源码
+COPY . .
+#安装依赖
+RUN npm install --registry=https://registry.npm.taobao.org
+
+# 开始构建
+RUN npm run build:prod
+
+# 第二阶段构建
+FROM nginx:alpine
+COPY --from=builder /app/kubeimooc-web/dist/ /usr/share/nginx/html/
+COPY --from=builder /app/kubeimooc-web/default.conf.template /etc/nginx/templates/default.conf.template
+EXPOSE 80
+
+```
+2. 编写 default.conf.template  
+   后端地址是通过环境变量中设置
+   ```
+   server {
+    listen       80;
+    listen  [::]:80;
+    server_name  localhost;
+
+    #access_log  /var/log/nginx/host.access.log  main;
+
+   location / {
+        root /usr/share/nginx/html;
+        #index index.html;
+        try_files $uri $uri/ /index.html;
+    }
+    #error_page  404              /404.html;
+
+    # redirect server error pages to the static page /50x.html
+    #
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+
+    location /prod-api/ {
+        proxy_pass  ${BACKEND_HOST};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+    }
+
+    # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+    #
+    #location ~ \.php$ {
+    #    proxy_pass   http://127.0.0.1;
+    #}
+
+    # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+    #
+    #location ~ \.php$ {
+    #    root           html;
+    #    fastcgi_pass   127.0.0.1:9000;
+    #    fastcgi_index  index.php;
+    #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+    #    include        fastcgi_params;
+    #}
+
+    # deny access to .htaccess files, if Apache's document root
+    # concurs with nginx's one
+    #
+    #location ~ /\.ht {
+    #    deny  all;
+    #}
+    }
+
+   ```
+3. 打包镜像
+   ```shell
+   docker build -t harbor.kubeimooc.com/kubeimooc/kubeimooc-web:v1.0 .
+   docker push harbor.kubeimooc.com/kubeimooc/kubeimooc-web:v1.0
+   ```
+   
+### 使用 docker-compose 部署
+```
+version: "3"
+networks:
+  network:
+    ipam:
+      driver: default
+      config:
+        - subnet: '17.7.0.0/16'
+services:
+  web:
+    container_name: kubeimooc-web
+    image: harbor.kubeimooc.com/kubeimooc/kubeimooc-web:v1.0
+    restart: always
+    environment:
+      BACKEND_HOST: 'http://17.7.0.12:8082/'
+    ports:
+      - '8081:80'
+    depends_on:
+      - server
+    networks:
+      network:
+        ipv4_address: 17.7.0.11
+
+  server:
+    container_name: kubeimooc-server
+    image: harbor.kubeimooc.com/kubeimooc/kubeimooc:v1.0
+    restart: always
+    ports:
+      - '8082:8082'
+    networks:
+      network:
+        ipv4_address: 17.7.0.12
+
+```
+使用以下命令部署  
+```shell
+docker-compose up -d
+docker-compose ps
+```
+然后浏览器中访问http://192.168.159.131:8081

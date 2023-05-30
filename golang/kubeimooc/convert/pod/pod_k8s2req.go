@@ -3,8 +3,9 @@ package pod
 import (
 	"fmt"
 
+	pod_res "kubeimooc/model/pod/response"
+
 	corev1 "k8s.io/api/core/v1"
-	pod_res "golang/kubeimooc/model/pod/response"
 )
 
 type K8s2ReqConvert struct {

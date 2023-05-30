@@ -2,11 +2,12 @@ package pod
 
 import (
 	"context"
-	"golang/kubeimooc/global"
+	"kubeimooc/global"
 	"strings"
 
+	pod_res "kubeimooc/model/pod/response"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	pod_res "golang/kubeimooc/model/pod/response"
 )
 
 type PodService struct {

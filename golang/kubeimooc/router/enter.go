@@ -1,8 +1,8 @@
 package router
 
 import (
-	"golang/kubeimooc/router/example"
-	"golang/kubeimooc/router/k8s"
+	"kubeimooc/router/example"
+	"kubeimooc/router/k8s"
 )
 
 type RouterGroup struct {

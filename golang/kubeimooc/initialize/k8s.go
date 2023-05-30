@@ -1,14 +1,14 @@
 package initialize
 
 import (
-	"golang/kubeimooc/global"
+	"kubeimooc/global"
 
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
 func K8S() {
-	kubeconfig := "/root/.kube/config"
+	kubeconfig := ".kube/config"
 	// use the current context in kubeconfig
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {

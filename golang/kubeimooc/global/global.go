@@ -1,7 +1,7 @@
 package global
 
 import (
-	"golang/kubeimooc/config"
+	"kubeimooc/config"
 
 	"k8s.io/client-go/kubernetes"
 )

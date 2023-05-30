@@ -1,6 +1,6 @@
 package k8s
 
-import "golang/kubeimooc/service"
+import "kubeimooc/service"
 
 type ApiGroup struct {
 	PodApi

@@ -1,6 +1,6 @@
 package convert
 
-import "golang/kubeimooc/convert/pod"
+import "kubeimooc/convert/pod"
 
 type ConvertGroup struct {
 	PodConvert pod.PodConvertGroup

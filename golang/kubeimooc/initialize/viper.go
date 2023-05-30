@@ -1,7 +1,7 @@
 package initialize
 
 import (
-	"golang/kubeimooc/global"
+	"kubeimooc/global"
 
 	"github.com/spf13/viper"
 )

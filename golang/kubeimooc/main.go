@@ -1,8 +1,8 @@
 package main
 
 import (
-	"golang/kubeimooc/global"
-	"golang/kubeimooc/initialize"
+	"kubeimooc/global"
+	"kubeimooc/initialize"
 )
 
 func main() {
