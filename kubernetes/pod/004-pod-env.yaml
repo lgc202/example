@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-env
+  namespace: dev
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.17.1
+    - name: busybox
+      image: busybox:1.30
+      command:
+        ["/bin/sh", "-c", "while true;do /bin/echo $(date +%T);sleep 60; done;"]
+      env: # 设置环境变量列表
+        - name: username
+          value: admin
+        - name: passwd
+          value: "123456"
+# env，环境变量，用于在pod中的容器设置环境变量
+# 这种方式不是很推荐，推荐将这些配置单独存储在配置文件中，这种方式将在后面介绍
+
+# 创建Pod
+# kubectl apply -f 004-pod-env.yaml
+
+# 进入容器，输出环境变量
+# kubectl exec -it pod-env -c busybox -n dev -- sh
+# echo $username
+# echo $passwd
+
+# 清理环境
+# kubectl delete -f 004-pod-env.yaml

@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-base
+  namespace: dev
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.17.1
+    - name: busybox
+      image: busybox:1.30
+
+# 创建 Pod， ns 没创建的需要用 kubectl create ns dev 先创建 namespace
+# kubectl apply -f 001-pod-base.yaml
+
+# 查看Pod状况
+# READY 1/2 : 表示当前Pod中有2个容器，其中1个准备就绪，1个未就绪
+# RESTARTS  : 重启次数，因为有1个容器故障了，Pod一直在重启试图恢复它
+
+# 可以通过describe查看内部的详情
+# 此时已经运行起来了一个基本的Pod，虽然它暂时有问题
+
+# 清理环境
+# kubectl delete -f 001-pod-base.yaml
