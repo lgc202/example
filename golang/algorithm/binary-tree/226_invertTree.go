@@ -1,5 +1,8 @@
 package binary_tree
 
+// invertTreeV1 利用递归函数的定义: 输入是树的根节点, 输出是一颗反转后的二叉树
+// 所以分别把左节点和右节点作为输入得到两颗反转后的子树, 再把两颗子树交互位置即得
+// 到反转后的二叉树
 func invertTreeV1(root *TreeNode) *TreeNode {
 	if root == nil {
 		return root

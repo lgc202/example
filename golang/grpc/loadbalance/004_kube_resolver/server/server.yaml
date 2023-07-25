@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-deployment
+  namespace: kube-resolver
+  labels:
+    app: server
+spec:
+  replicas: 3
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: server
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      containers:
+        - name: server
+          image: kube-resolver-server:v1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: server-service
+  namespace: kube-resolver
+spec:
+  selector:
+    app: server
+  ports:
+    - port: 8080
