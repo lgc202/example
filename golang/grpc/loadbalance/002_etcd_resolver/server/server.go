@@ -1,29 +1,20 @@
-package _02_etcd_resolver
+package main
 
 import (
 	greet "002_etcd_resolver/proto"
 	"context"
-	"fmt"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/client/v3/naming/endpoints"
-	etcdResolver "go.etcd.io/etcd/client/v3/naming/resolver"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/resolver"
 	"log"
 	"net"
 	"strings"
-	"testing"
 	"time"
 )
 
-func TestEtcdResolver(t *testing.T) {
-	go StartServer("localhost:8080")
-	go StartServer("localhost:8081")
-
-	time.Sleep(time.Second * 3)
-
-	StartClient()
-}
+const (
+	ServiceName = "greet"
+)
 
 type greeterServer struct {
 	greet.UnimplementedGreeterServer
@@ -50,7 +41,7 @@ func StartServer(addr string) {
 	}()
 
 	client, err := clientv3.New(clientv3.Config{
-		Endpoints:   []string{"localhost:2379"},
+		Endpoints:   []string{"localhost:2382"},
 		DialTimeout: 5 * time.Second,
 	})
 	if err != nil {
@@ -76,7 +67,7 @@ func StartServer(addr string) {
 	}
 
 	defer func() {
-		// 取消注册, 如果不主动撤销, 客户端还会继续往服务器发送请求, 直到租约过期
+		// 取消注册
 		if err := em.DeleteEndpoint(client.Ctx(), ServiceName+"/"+addr); err != nil {
 			log.Println(err)
 		}
@@ -85,6 +76,7 @@ func StartServer(addr string) {
 		_ = client.Close()
 	}()
 
+	log.Printf("start server success on: %s\n", addr)
 	timer := time.NewTicker(30 * time.Second)
 	for {
 		select {
@@ -105,60 +97,9 @@ func StartServer(addr string) {
 	}
 }
 
-func StartClient() {
-	// 创建并注册etcdResolver
-	c, err := clientv3.New(clientv3.Config{
-		Endpoints:   []string{"localhost:2379"},
-		DialTimeout: 5 * time.Second,
-	})
-	if err != nil {
-		log.Fatalf(err.Error())
-	}
+func main() {
+	go StartServer("localhost:8080")
+	go StartServer("localhost:8081")
 
-	if err := registerEtcdResolver(c); err != nil {
-		log.Fatalf(err.Error())
-	}
-
-	// 建立对应 scheme 的连接, 并且配置负载均衡
-	req := greet.Request{Name: "client"}
-	conn, err := grpc.Dial(
-		fmt.Sprintf("etcd:///%s", ServiceName),
-		grpc.WithInsecure(),
-		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`),
-	)
-
-	if err != nil {
-		log.Fatalf(err.Error())
-	}
-	defer func() {
-		_ = conn.Close()
-	}()
-
-	client := greet.NewGreeterClient(conn)
-	for {
-		time.Sleep(time.Second)
-		response, err := client.Greet(context.Background(), &req)
-		if err != nil {
-			log.Println(err.Error())
-			continue
-		}
-
-		log.Printf("got the response from server: %s\n", response.GetGreet())
-	}
-}
-
-const (
-	ServiceName = "greet"
-)
-
-func registerEtcdResolver(c *clientv3.Client) error {
-	// 如果遇到以下错误, 就降低一下 grpc 的版本
-	// cannot use target.Endpoint (value of type func() string) as string value in struct literal
-	builder, err := etcdResolver.NewBuilder(c)
-	if err != nil {
-		return err
-	}
-
-	resolver.Register(builder)
-	return nil
+	select {}
 }

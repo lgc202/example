@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: client-deployment
-  namespace: kube-resolver
+  namespace: istio-loadbalance
   labels:
     app: client
 spec:
@@ -16,7 +16,6 @@ spec:
       labels:
         app: client
     spec:
-      serviceAccountName: endpoints-reader
       containers:
         - name: client
-          image: kube-resolver-client:v1
+          image: istio-loadbalance-client:v1

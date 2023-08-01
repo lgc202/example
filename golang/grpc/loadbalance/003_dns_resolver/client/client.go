@@ -41,6 +41,13 @@ func main() {
 // 1. 编译镜像
 // docker build -t dns-resolver-client:v1 .
 // docker build -t dns-resolver-server:v1 .
+// 如果 k8s 环境的container runtime是containerd, 还需要转换一下镜像
+// docker save dns-resolver-client:v1 -o dns-resolver-client.tar
+// docker save dns-resolver-server:v1 -o dns-resolver-server.tar
+// export ctr="ctr -a /run/k3s/containerd/containerd.sock --namespace k8s.io"
+// ctr image import dns-resolver-client.tar && rm dns-resolver-client.tar
+// ctr image import dns-resolver-server.tar && rm dns-resolver-server.tar
+// 查看是否成功: crictl images | grep dns-resolver
 
 // 2. 部署server和client
 // kubectl create ns dns-resolver

@@ -50,6 +50,7 @@ package day02
 //
 // Related Topics 数组 👍 214 👎 0
 
+// 本题跟山脉数组相关
 func validMountainArray(arr []int) bool {
 	if len(arr) < 3 {
 		return false

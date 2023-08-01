@@ -5,6 +5,7 @@ import (
 )
 
 const (
+	// 定义 scheme 的名字
 	exampleScheme = "example"
 )
 
@@ -15,6 +16,7 @@ func NewExampleResolverBuilder() *exampleResolverBuilder {
 	return &exampleResolverBuilder{}
 }
 
+// Build 用来构建一个 resolver
 func (e *exampleResolverBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOptions) (resolver.Resolver, error) {
 	r := &exampleResolver{}
 

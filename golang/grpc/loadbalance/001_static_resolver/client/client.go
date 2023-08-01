@@ -1,50 +1,18 @@
-package _01_static_resolver
+package main
 
 import (
+	staticresolver "001_static_resolver"
 	greet "001_static_resolver/proto"
 	"context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/resolver"
 	"log"
-	"net"
-	"testing"
 	"time"
 )
 
-func TestResolveStaticAddr(t *testing.T) {
-	go StartServer("localhost:8080")
-	go StartServer("localhost:8081")
-
-	time.Sleep(time.Second * 3)
-
-	StartClient()
-}
-
-type greeterServer struct {
-	greet.UnimplementedGreeterServer
-	addr string
-}
-
-func (g *greeterServer) Greet(context.Context, *greet.Request) (*greet.Response, error) {
-	return &greet.Response{Greet: g.addr}, nil
-}
-
-func StartServer(addr string) {
-	listener, err := net.Listen("tcp", addr)
-	if err != nil {
-		log.Fatalf(err.Error())
-	}
-
-	server := grpc.NewServer()
-	greet.RegisterGreeterServer(server, &greeterServer{addr: addr})
-	if err = server.Serve(listener); err != nil {
-		log.Fatalf(err.Error())
-	}
-}
-
-func StartClient() {
+func main() {
 	// 注册我们的 resolver
-	resolver.Register(NewExampleResolverBuilder())
+	resolver.Register(staticresolver.NewExampleResolverBuilder())
 
 	// 建立对应 scheme 的连接, 并且配置负载均衡
 	// example:///test 中的 test 一般是远程服务的服务名, 如果使用etcd等作为注册中心，可用该服务名去注册中心找出
