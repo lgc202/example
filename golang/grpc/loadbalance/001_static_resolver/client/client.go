@@ -19,9 +19,10 @@ func main() {
 	// 属于该服务的所有实例，在这个例子中 test 的值可以随便填
 	req := greet.Request{Name: "client"}
 	conn, err := grpc.Dial(
-		"example:///test",
+		//"example:///test",
+		"localhost:8080",
 		grpc.WithInsecure(),
-		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`),
+		//grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`),
 	)
 
 	if err != nil {
@@ -35,7 +36,9 @@ func main() {
 	for {
 		response, err := client.Greet(context.Background(), &req)
 		if err != nil {
-			log.Fatalf(err.Error())
+			log.Println(err.Error())
+			log.Println(conn.GetState())
+			continue
 		}
 
 		log.Printf("got the response from server: %s\n", response.GetGreet())
