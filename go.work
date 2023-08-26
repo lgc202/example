@@ -8,5 +8,6 @@ use (
 	golang/grpc/loadbalance/003_dns_resolver/server
 	golang/grpc/loadbalance/004_kube_resolver/client
 	golang/grpc/loadbalance/004_kube_resolver/server
+	golang/grpc/loadbalance/005_istio_loadbalance/client
 )
 
